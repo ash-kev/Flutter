@@ -1,4 +1,5 @@
 import "package:http/http.dart" as http;
+import "dart:convert" as convert; // to convert json string to dart object.
 
 String intro({String? name, required int age}) {
   // '?' after annotation means that variable is oprtional and can be null. 'required' means that variable is required and cant be null.
@@ -11,7 +12,7 @@ class collection {
 
   collection(this.name, this.data);
 
-  randomItem() {
+  dynamic randomItem() {
     data.shuffle();
     return data[0];
   }
@@ -135,7 +136,8 @@ void main() async {
 
   //print("post.title: ${post.title} , post.id: ${post.id}");
 
-  fetchPost();
+  final post = await fetchPost();
+  print("post.title: ${post.title} , post.id: ${post.id}");
 }
 
 // org - https://jsonplaceholder.typicode.com/
@@ -145,8 +147,19 @@ Future<Post> fetchPost() async {
   var uri = Uri.https('jsonplaceholder.typicode.com', '/posts/1');
 
   final response = await http.get(uri);
+  print(
+    response.body,
+  ); // returns a json string hence we import dart:convert to convert it to a dart object.
 
-  print(response.body);
+  Map<String, dynamic> data = convert.jsonDecode(
+    response.body,
+  ); //converrts the json string into a map where the key are of type string and the valuews are dynamic hence can be of any data type.
+
+  return Post(
+    data['title'],
+    data['id'],
+  ); // returns a post object with the title and id from the json response.
+
   /*const delay = Duration(seconds: 3);
 
   return Future.delayed(delay, () {
